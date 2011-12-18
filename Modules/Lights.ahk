@@ -1,13 +1,16 @@
 class Lights
 {
-    static 1 := new Raydium.Lights.Light(1)
-    static 2 := new Raydium.Lights.Light(2)
-    static 3 := new Raydium.Lights.Light(3)
-    static 4 := new Raydium.Lights.Light(4)
-    static 5 := new Raydium.Lights.Light(5)
-    static 6 := new Raydium.Lights.Light(6)
-    static 7 := new Raydium.Lights.Light(7)
-    static 8 := new Raydium.Lights.Light(8)
+    __New()
+    {
+        this[1] := new Raydium.Lights.Light(1)
+        this[2] := new Raydium.Lights.Light(2)
+        this[3] := new Raydium.Lights.Light(3)
+        this[4] := new Raydium.Lights.Light(4)
+        this[5] := new Raydium.Lights.Light(5)
+        this[6] := new Raydium.Lights.Light(6)
+        this[7] := new Raydium.Lights.Light(7)
+        this[8] := new Raydium.Lights.Light(8)
+    }
 
     class Light
     {
@@ -69,7 +72,7 @@ class Lights
                 DllCall("Raydium.dll\raydium_light_update_all","UInt",Index,"CDecl")
             }
             ObjInsert(this[""],Key,Value)
-            Return
+            Return, this
         }
     }
 }

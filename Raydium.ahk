@@ -1,17 +1,18 @@
 #NoEnv
 
 GameWindow := new Raydium("Test Game")
-GameWindow.Projection.FieldOfView := 40
-;GameWindow.Projection.Type := "Orthographic"
+GameWindow.Camera.FieldOfView := 40
+;GameWindow.Camera.Type := "Orthographic"
 
 DllCall("Raydium.dll\raydium_joy_key_emul","CDecl")
 
 GameWindow.Lights[1].State := 1
 GameWindow.Lights[1].Position := [1.0,1.0,1.0]
-GameWindow.Lights[1].Intensity := 1000000
-GameWindow.Lights[1].Color := [1,1,1]
+GameWindow.Lights[1].Intensity := 1000000 ;wip: not working
+GameWindow.Lights[1].Color := [0.0,1.0,0.0]
 
-DllCall("Raydium.dll\raydium_background_color_change","Float",1.0,"Float",1.0,"Float",1.0,"CDecl")
+GameWindow.Environment.Background := [1.0,0.0,0.0]
+
 ;DllCall("Raydium.dll\raydium_fog_disable","CDecl")
 
 UFO := DllCall("Raydium.dll\raydium_object_load","AStr","ufo.tri","CDecl")
@@ -42,14 +43,16 @@ class Raydium
 
         DllCall("Raydium.dll\raydium_texture_filter_change","UInt",2,"CDecl") ;RAYDIUM_TEXTURE_FILTER_TRILINEAR: highest quality texture filter
 
-        this.Projection := new Raydium.Projection(this.hModule)
+        this.Camera := new Raydium.Camera(this.hModule)
         this.Lights := new Raydium.Lights
+        this.Environment := new Raydium.Environment
         Raydium.Lights.pColors := DllCall("GetProcAddress","UPtr",this.hModule,"AStr","raydium_light_color")
         Raydium.Lights.pIntensities := DllCall("GetProcAddress","UPtr",this.hModule,"AStr","raydium_light_intensity")
     }
 
-    #Include Modules\Projection.ahk
+    #Include Modules\Camera.ahk
     #Include Modules\Lights.ahk
+    #Include Modules\Environment.ahk
 
     __Delete()
     {

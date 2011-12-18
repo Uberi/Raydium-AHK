@@ -1,13 +1,14 @@
-class Projection
+class Camera
 {
     __New(hModule)
     {
         ObjInsert(this,"",Object())
+        this.pType := DllCall("GetProcAddress","UPtr",hModule,"AStr","raydium_projection")
+
+        this.Type := "Perspective"
         this.ClipNear := 0.1
         this.ClipFar := 1000
         this.FieldOfView := 90
-
-        this.pType := DllCall("GetProcAddress","UPtr",hModule,"AStr","raydium_projection")
     }
 
     __Get(Key)
@@ -31,7 +32,7 @@ class Projection
                 DllCall("Raydium.dll\raydium_window_view_update","CDecl")
             }
             Else
-                throw Exception("Unknown projection: " . Value . ".",-1)
+                throw Exception("Unknown type: " . Value . ".",-1)
         }
         Else If (Key = "ClipNear")
         {
@@ -52,6 +53,6 @@ class Projection
             DllCall("Raydium.dll\raydium_window_view_perspective","Float",Value,"Float",this.ClipNear,"Float",this.ClipFar,"CDecl") ;update the near clipping limit
         }
         ObjInsert(this[""],Key,Value)
-        Return
+        Return, this
     }
 }
