@@ -1,22 +1,24 @@
 #NoEnv
 
 GameWindow := new Raydium("Test Game")
-GameWindow.Camera.FieldOfView := 40
+GameWindow.Camera.FieldOfView := 60
 ;GameWindow.Camera.Type := "Orthographic"
 
-DllCall("Raydium.dll\raydium_joy_key_emul","CDecl")
-
 GameWindow.Lights[1].State := 1
-GameWindow.Lights[1].Position := [1.0,1.0,1.0]
+GameWindow.Lights[1].Position := [4.0,4.0,4.0]
 GameWindow.Lights[1].Intensity := 1000000 ;wip: not working
 GameWindow.Lights[1].Color := [0.0,1.0,0.0]
 
+CameraX := 10, CameraY := 10, CameraZ := 20
+
 GameWindow.Environment.Background := [1.0,0.0,0.0]
+GameWindow.Environment.Ambient := [0.8,0.8,0.8]
 
 ;DllCall("Raydium.dll\raydium_fog_disable","CDecl")
+DllCall("Raydium.dll\raydium_shadow_enable","CDecl")
 
-UFO := DllCall("Raydium.dll\raydium_object_load","AStr","ufo.tri","CDecl")
-If (UFO = -1)
+Ground := DllCall("Raydium.dll\raydium_object_load","AStr","test.tri","CDecl")
+If (Ground = -1)
     ExitApp ;error loading file
 
 pCallBack := RegisterCallback("Display","Fast")
@@ -62,30 +64,17 @@ class Raydium
 
 Display()
 {
-    global UFO
-    DllCall("Raydium.dll\raydium_clear_frame","CDecl")
-    DllCall("Raydium.dll\raydium_object_draw","UInt",UFO,"CDecl")
-    DllCall("Raydium.dll\raydium_camera_look_at","Float",3.0,"Float",2.0,"Float",2.0,"Float",0.0,"Float",0.0,"Float",0.0,"CDecl")
-    DllCall("Raydium.dll\raydium_rendering_finish","CDecl")
-}
+    global Ground, UFO
+    global GameWindow, CameraX, CameraY, CameraZ ;wip: temporary
 
-ShowObject(ShowObject,Padding = "")
-{
- ListLines, Off
- If !IsObject(ShowObject)
- {
-  ListLines, On
-  Return, ShowObject
- }
- ObjectContents := ""
- For Key, Value In ShowObject
- {
-  If IsObject(Value)
-   Value := "`n" . ShowObject(Value,Padding . A_Tab)
-  ObjectContents .= Padding . Key . ": " . Value . "`n"
- }
- ObjectContents := SubStr(ObjectContents,1,-1)
- If (Padding = "")
-  ListLines, On
- Return, ObjectContents
+    ;DllCall("Raydium.dll\raydium_joy_key_emul","CDecl")
+    ;CameraX += NumGet(DllCall("GetProcAddress","UPtr",GameWindow.hModule,"AStr","raydium_joy_x"),0,"Float")
+    ;CameraY += NumGet(DllCall("GetProcAddress","UPtr",GameWindow.hModule,"AStr","raydium_joy_y"),0,"Float")
+    ;DllCall("Raydium.dll\raydium_camera_look_at","Float",CameraX,"Float",CameraY,"Float",CameraZ,"Float",0.0,"Float",0.0,"Float",0.0,"CDecl")
+
+    DllCall("Raydium.dll\raydium_camera_freemove","UInt",1,"CDecl")
+
+    DllCall("Raydium.dll\raydium_clear_frame","CDecl")
+    DllCall("Raydium.dll\raydium_object_draw","UInt",Ground,"CDecl")
+    DllCall("Raydium.dll\raydium_rendering_finish","CDecl")
 }
