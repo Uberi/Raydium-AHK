@@ -1,23 +1,15 @@
 #NoEnv
 
 GameWindow := new Raydium("Test Game")
-GameWindow.Projection.FieldOfView := 60
+GameWindow.Projection.FieldOfView := 40
 ;GameWindow.Projection.Type := "Orthographic"
 
 DllCall("Raydium.dll\raydium_joy_key_emul","CDecl")
 
 GameWindow.Lights[1].State := 1
-GameWindow.Lights[1].Position := [1.0,2.0,1.0]
-
-VarSetCapacity(LightPosition,16), NumPut(1,LightPosition,0,"Float"), NumPut(1,LightPosition,4,"Float"), NumPut(1,LightPosition,8,"Float"), NumPut(0,LightPosition,12,"Float")
-DllCall("Raydium.dll\raydium_light_move","UInt",0,"UPtr",&LightPosition,"CDecl") ;move the light
-
-pLightIntensities := DllCall("GetProcAddress","UPtr",GameWindow.hModule,"AStr","raydium_light_color")
-NumPut(1000000.0,pLightIntensities + 0,0,"Float")
-
-pLightColors := DllCall("GetProcAddress","UPtr",GameWindow.hModule,"AStr","raydium_light_color")
-NumPut(1.0,pLightColors + 0,0,"Float"), NumPut(0.0,pLightColors + 0,4,"Float"), NumPut(1.0,pLightColors + 0,8,"Float"), NumPut(1.0,pLightColors + 0,12,"Float") ;green light
-DllCall("Raydium.dll\raydium_light_update_all","UInt",0,"CDecl")
+GameWindow.Lights[1].Position := [1.0,1.0,1.0]
+GameWindow.Lights[1].Intensity := 1000000
+GameWindow.Lights[1].Color := [1,1,1]
 
 DllCall("Raydium.dll\raydium_background_color_change","Float",1.0,"Float",1.0,"Float",1.0,"CDecl")
 ;DllCall("Raydium.dll\raydium_fog_disable","CDecl")
@@ -43,8 +35,8 @@ class Raydium
             RenderMode := 1 ;RAYDIUM_RENDERING_FULLSCREEN
         Else If (WindowType = "Fixed") ;fixed size window
             RenderMode := 10 ;RAYDIUM_RENDERING_WINDOW_FIXED
-        Else ;unknown window type
-            throw Exception("Unknown window type: " . WindowType . ".",-1)
+        Else ;invalid window type
+            throw Exception("Invalid window type: " . WindowType . ".",-1)
 
         DllCall("Raydium.dll\raydium_window_create","UInt",Width,"UInt",Height,"Char",RenderMode,"AStr",Title,"CDecl")
 
@@ -52,6 +44,8 @@ class Raydium
 
         this.Projection := new Raydium.Projection(this.hModule)
         this.Lights := new Raydium.Lights
+        Raydium.Lights.pColors := DllCall("GetProcAddress","UPtr",this.hModule,"AStr","raydium_light_color")
+        Raydium.Lights.pIntensities := DllCall("GetProcAddress","UPtr",this.hModule,"AStr","raydium_light_intensity")
     }
 
     #Include Modules\Projection.ahk
