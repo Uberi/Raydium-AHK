@@ -32,18 +32,18 @@ class Camera
                 DllCall("Raydium.dll\raydium_window_view_update","CDecl")
             }
             Else
-                throw Exception("Unknown type: " . Value . ".",-1)
+                throw Exception("Invalid type: " . Value . ".",-1)
         }
-        Else If (Key = "ClipNear")
+        Else If (Key = "Near")
         {
             If Value Is Not Number
-                throw Exception("Invalid near clipping limit: " . Value . ".",-1)
+                throw Exception("Invalid near limit: " . Value . ".",-1)
             DllCall("Raydium.dll\raydium_window_view_perspective","Float",this.FieldOfView,"Float",Value,"Float",this.ClipFar,"CDecl") ;update the near clipping limit
         }
-        Else If (Key = "ClipFar")
+        Else If (Key = "Far")
         {
             If Value Is Not Number
-                throw Exception("Invalid far clipping limit: " . Value . ".",-1)
+                throw Exception("Invalid far limit: " . Value . ".",-1)
             DllCall("Raydium.dll\raydium_window_view_perspective","Float",this.FieldOfView,"Float",this.ClipNear,"Float",Value,"CDecl") ;update the near clipping limit
         }
         Else If (Key = "FieldOfView")

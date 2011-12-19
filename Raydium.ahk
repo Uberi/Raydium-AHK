@@ -9,13 +9,11 @@ GameWindow.Lights[1].Position := [4.0,4.0,4.0]
 GameWindow.Lights[1].Intensity := 1000000 ;wip: not working
 GameWindow.Lights[1].Color := [0.0,1.0,0.0]
 
-CameraX := 10, CameraY := 10, CameraZ := 20
+GameWindow.Environment.Fog.State := 1
+GameWindow.Environment.Fog.Type := "Exponential"
+GameWindow.Environment.Fog.Density := 0.05
 
-GameWindow.Environment.Background := [1.0,0.0,0.0]
-GameWindow.Environment.Ambient := [0.8,0.8,0.8]
-
-;DllCall("Raydium.dll\raydium_fog_disable","CDecl")
-DllCall("Raydium.dll\raydium_shadow_enable","CDecl")
+;CameraX := 10, CameraY := 10, CameraZ := 20
 
 Ground := DllCall("Raydium.dll\raydium_object_load","AStr","test.tri","CDecl")
 If (Ground = -1)
