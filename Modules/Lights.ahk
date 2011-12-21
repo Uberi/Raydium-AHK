@@ -1,7 +1,10 @@
 class Lights
 {
-    __New()
+    __New(hModule)
     {
+        Raydium.Lights.pColors := DllCall("GetProcAddress","UPtr",hModule,"AStr","raydium_light_color")
+        Raydium.Lights.pIntensities := DllCall("GetProcAddress","UPtr",hModule,"AStr","raydium_light_intensity")
+
         this[1] := new Raydium.Lights.Light(1)
         this[2] := new Raydium.Lights.Light(2)
         this[3] := new Raydium.Lights.Light(3)

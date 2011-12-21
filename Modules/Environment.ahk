@@ -33,6 +33,12 @@ class Environment
             NumPut(ObjHasKey(Value,4) ? Value[4] : 1.0,GlobalAmbience,12,"Float")
             DllCall("opengl32.dll\glLightModelfv","UInt",0xB53,"UPtr",&GlobalAmbience) ;GL_LIGHT_MODEL_AMBIENT
         }
+        Else If (Key = "Gravity")
+        {
+            If !IsObject(Value)
+                throw Exception("Invalid gravity: " . Position . ".",-1)
+            DllCall("Raydium.dll\raydium_ode_gravity_3f","Float",Value[1],"Float",Value[2],"Float",Value[3],"CDecl")
+        }
         ObjInsert(this[""],Key,Value)
         Return, this
     }

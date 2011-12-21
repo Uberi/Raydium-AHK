@@ -9,13 +9,24 @@ GameWindow.Lights[1].Position := [4.0,4.0,4.0]
 GameWindow.Lights[1].Intensity := 1000000 ;wip: not working
 GameWindow.Lights[1].Color := [0.0,1.0,0.0]
 
+GameWindow.Environment.Background := [0.7,0.8,1.0]
+
 GameWindow.Environment.Fog.State := 1
-GameWindow.Environment.Fog.Type := "Exponential"
-GameWindow.Environment.Fog.Density := 0.05
+GameWindow.Environment.Fog.Type := "DoubleExponential"
+GameWindow.Environment.Fog.Density := 0.1
 
 ;CameraX := 10, CameraY := 10, CameraZ := 20
 
-Ground := DllCall("Raydium.dll\raydium_object_load","AStr","test.tri","CDecl")
+/*
+;wip: skybox not working
+;DllCall("Raydium.dll\raydium_fog_disable","CDecl")
+NumPut(1,DllCall("GetProcAddress","UPtr",GameWindow.hModule,"AStr","raydium_sky_force"),0,"Char")
+DllCall("Raydium.dll\raydium_sky_enable","AStr","desert","CDecl")
+DllCall("Raydium.dll\raydium_sky_box_name","AStr","desert","CDecl")
+DllCall("Raydium.dll\raydium_sky_box_cache","CDecl")
+*/
+
+GameWindow.Entities.Ground := new Raydium.Entity("test.tri")
 If (Ground = -1)
     ExitApp ;error loading file
 
@@ -44,10 +55,28 @@ class Raydium
         DllCall("Raydium.dll\raydium_texture_filter_change","UInt",2,"CDecl") ;RAYDIUM_TEXTURE_FILTER_TRILINEAR: highest quality texture filter
 
         this.Camera := new Raydium.Camera(this.hModule)
-        this.Lights := new Raydium.Lights
+        this.Lights := new Raydium.Lights(this.hModule)
         this.Environment := new Raydium.Environment
-        Raydium.Lights.pColors := DllCall("GetProcAddress","UPtr",this.hModule,"AStr","raydium_light_color")
-        Raydium.Lights.pIntensities := DllCall("GetProcAddress","UPtr",this.hModule,"AStr","raydium_light_intensity")
+    }
+
+    static Entities := Object()
+
+    class Entity
+    {
+        static Counter := 0
+
+        __New(Path,Translation,Rotation)
+        {
+            this.Path := Path
+            this.MeshID := DllCall("Raydium.dll\raydium_object_load","AStr",Name,"CDecl")
+            If this.MeshID = -1 ;error loading entity
+                throw Exception("Could not load entity: " . Path . ".",-1)
+            this.Name := "Entity" . Raydium.Entity.Counter
+            Raydium.Entity.Counter ++
+            this.ObjectID := DllCall("Raydium.dll\raydium_ode_object_create","AStr",this.Name,"CDecl")
+            If this.ObjectID = -1 ;error loading entity
+                throw Exception("Could not load entity: " . Path . ".",-1)
+        }
     }
 
     #Include Modules\Camera.ahk
@@ -71,6 +100,7 @@ Display()
     ;DllCall("Raydium.dll\raydium_camera_look_at","Float",CameraX,"Float",CameraY,"Float",CameraZ,"Float",0.0,"Float",0.0,"Float",0.0,"CDecl")
 
     DllCall("Raydium.dll\raydium_camera_freemove","UInt",1,"CDecl")
+    DllCall("Raydium.dll\raydium_sky_box_render","Float",0.0,"Float",0.0,"Float",0.0,"CDecl")
 
     DllCall("Raydium.dll\raydium_clear_frame","CDecl")
     DllCall("Raydium.dll\raydium_object_draw","UInt",Ground,"CDecl")

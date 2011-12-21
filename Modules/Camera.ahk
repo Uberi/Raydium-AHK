@@ -1,6 +1,6 @@
 class Camera
 {
-    __New(hModule)
+    __New()
     {
         ObjInsert(this,"",Object())
         this.pType := DllCall("GetProcAddress","UPtr",hModule,"AStr","raydium_projection")
